@@ -1,0 +1,40 @@
+{
+    "name": "itpathsolutions/dbstan",
+    "description": "Database Standardization and Analysis Tool for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Itpathsolutions\\DBStan\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "It Path Solutions"
+        }
+    ],
+    "keywords": [
+        "dbstan",
+        "laravel",
+        "php",
+        "performance",
+        "database",
+        "schema", 
+        "analysis",
+        "itpathsolutions"
+    ],
+    "require": {
+        "php": "^8.1|^8.2|^8.3",
+        "illuminate/console": "^9.0|^10.0|^11.0",
+        "illuminate/support": "^9.0|^10.0|^11.0",
+        "illuminate/database": "^9.0|^10.0|^11.0"
+    },
+    "extra": {
+        "laravel":{
+            "providers":[
+                "Itpathsolutions\\DBStan\\DBStanServiceProvider"
+            ]
+        }
+    },
+    "version": "1.0.1"
+}
