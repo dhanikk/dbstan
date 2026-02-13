@@ -104,22 +104,6 @@ This command scans your entire database and displays categorized results in the 
 
 ---
 
-### **Export Report**
-
-To export the report to a file:
-
-```bash
-php artisan dbstan:analyze --export
-```
-
-Reports will be generated inside:
-
-```
-storage/app/dbstan-reports/
-```
-
----
-
 ## **Output Categories**
 
 DBStan categorizes findings into the following types:
