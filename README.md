@@ -129,95 +129,13 @@ To analyze your database schema:
 php artisan dbstan:analyze
 ```
 
-This command scans your entire database and displays categorized results in the terminal.
-
----
-
-### **Route for local or stage**
-
-To analyze your database schema:
+or
 
 ```bash
 http://127.0.0.1:8000/dbstan
 ```
 
-This url scans your entire database and displays categorized results in the browser.
-
----
-
-
-## **Output Categories**
-
-
-Each check is designed to catch specific schema issues. Here’s what some of the key checks do:
-
-- **Audit Trail Check:** Ensures tables have `created_by`, `updated_by`, and `deleted_by` columns for tracking changes and maintaining data integrity.
-- **JSON Column Overuse:** Warns if a table uses too many JSON columns, which can hurt performance and maintainability.
-- **Boolean Overuse:** Flags tables with excessive boolean/tinyint(1) columns, suggesting use of ENUM or state machine instead.
-- **Polymorphic Relation Overuse:** Detects multiple polymorphic relations in a table and missing composite indexes for them.
-- **Foreign Key Cascading Rules:** Identifies foreign keys using `NO ACTION` or `RESTRICT` on delete, which may cause orphaned records.
-- **Duplicate Rows Risk:** Warns if a table lacks PRIMARY or UNIQUE constraints, risking duplicate data.
-- **Foreign Key Naming Convention:** Flags columns that look like foreign keys but don’t follow the `_id` naming convention.
-- **Possible Orphan Risk:** Detects `_id` columns without foreign key constraints or nullable foreign keys.
-- **Unique Constraint Violations:** Finds columns (like `email`, `slug`) with duplicate values where uniqueness is expected.
-- **Log Table Indexing:** Ensures `created_at` and `user_id` are indexed in log tables for query performance.
-- **Missing Foreign Key Indexes:** Flags foreign key columns missing indexes.
-- **High NULL Value Ratio:** Warns if nullable columns have a high percentage of NULLs.
-- **Status Column Index:** Checks if `status`/`state` columns are indexed for efficient filtering.
-- **Table Size Analysis:** Alerts if a table exceeds a size threshold (e.g., 100MB).
-- **Unbounded Growth Risk:** Detects tables likely to grow indefinitely (log/event/audit) without proper indexing.
-- **Data Type Appropriateness:** Flags columns (e.g., `price`) using inappropriate types (e.g., INT instead of DECIMAL).
-- **Enum Overuse:** Warns about too many ENUM columns or ENUMs with too many values.
-- **Large TEXT Columns:** Flags large TEXT columns that may impact performance.
-- **Missing Soft Deletes:** Warns if `deleted_at` is missing for soft deletes.
-- **Missing Timestamps:** Warns if `created_at`/`updated_at` are missing.
-- **Mixed Domain Columns:** Detects columns storing mixed data types (e.g., info/data/details in varchar).
-- **Nullable Column Overuse:** Flags nullable columns without clear justification.
-- **Pivot Table Structure:** Detects improper pivot table design (should have exactly two FK columns, no id/timestamps).
-- **Repeated Common Fields:** Flags repeated fields (email, phone, etc.) across tables.
-- **Too Many Columns:** Warns if a table has more columns than recommended.
-- **Wide Varchar Columns:** Flags VARCHAR columns exceeding recommended length.
-
-### ❌ ERROR
-Critical schema problems that require immediate attention:
-- Foreign key without index
-- Broken foreign key relationships
-- Invalid constraints
-- Duplicate rows risk (no PRIMARY or UNIQUE)
-
-### ⚠️ WARNING
-Structural or design concerns:
-- Too many nullable columns
-- Overuse of JSON, ENUM, or boolean columns
-- Excessive number of columns in a table
-- Wide VARCHAR columns
-- Improper pivot table structure
-- Mixed domain columns (e.g., info/data/details in varchar)
-- Improper foreign key naming
-- Polymorphic relation overuse
-
-### 💡 SUGGESTION
-Improvement recommendations:
-- Missing timestamps
-- Missing soft deletes
-- Repeated fields across tables
-- Data type appropriateness (e.g., price as INT)
-- Status columns missing indexes
-
-### 🚨 PERFORMANCE RISK
-Potential performance bottlenecks:
-- Large TEXT fields
-- Unindexed foreign keys or log tables
-- High NULL value ratio
-- Table size exceeds threshold
-- Unbounded growth risk (log/event/audit tables)
-- Heavy JSON usage
-
-### 🛡️ INTEGRITY
-Referential and data integrity issues:
-- Orphan risk (missing or nullable foreign keys)
-- Foreign key cascading rules (NO ACTION/RESTRICT)
-- Unique constraint violations (duplicate values)
+These both scans your entire database and displays categorized results in the browser or terminal.
 
 ---
 
@@ -261,56 +179,3 @@ It does **NOT** make any changes to your database.
 
 Yes, but it is recommended to use it in development or staging environments.  
 Avoid exposing schema analysis publicly.
-
----
-
-### 4. Can I use this in CI/CD?
-
-Yes. You can integrate:
-
-```bash
-php artisan dbstan:analyze
-```
-
-into your CI pipeline to maintain schema quality standards.
-
----
-
-### 5. Which Laravel versions are supported?
-
-Laravel 9, 10, and 11 with PHP 8+ compatibility.
-
----
-
-## **Contributing**
-
-We welcome contributions from the community!
-
-Feel free to **Fork** the repository and submit a Pull Request.
-
-Please refer to the [CONTRIBUTING](https://github.com/your-username/dbstan/blob/main/CONTRIBUTING.md) guidelines for details.
-
----
-
-## **Security Vulnerabilities**
-
-If you discover any security vulnerability, please report it responsibly through the repository's security policy.
-
----
-
-## **License**
-
-This package is open-source and available under the MIT License.
-
----
-
-## **Get Support**  
-- Feel free to [contact us](https://www.itpathsolutions.com/contact-us/) if you have any questions.  
-- If you find this project helpful, please give us a ⭐ [Star](https://github.com/dhanikk/dbstan/stargazers).  
-
-## **You may also find our other useful packages:**  
-- [MySQL Info Package 🚀](https://packagist.org/packages/itpathsolutions/mysqlinfo)  
-- [PHP Info Package 🚀](https://packagist.org/packages/itpathsolutions/phpinfo)  
-- [Role Wise Session Manager Package 🚀](https://packagist.org/packages/itpathsolutions/role-wise-session-manager)  
-- [Authinfo - User Login Tracker 🚀](https://packagist.org/packages/itpathsolutions/authinfo)   
-- [Chatbot Package 🚀](https://packagist.org/packages/itpathsolutions/chatbot)   
