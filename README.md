@@ -58,23 +58,23 @@ Do **NOT** expose this tool publicly in production without proper access restric
 
 ## **Features**
 
-✔ Analyze full database schema structure
-✔ Detect missing indexes on foreign keys and log tables
-✔ Identify nullable column overuse and high NULL value ratios
-✔ Detect normalization and integrity issues (duplicate rows, orphan risks, improper foreign key naming)
-✔ Audit trail checks (created_by, updated_by, deleted_by columns)
-✔ Detect repeated common fields across tables
-✔ Identify tables with too many columns or wide VARCHARs
-✔ Highlight performance risks (large TEXT columns, JSON overuse, unbounded growth, table size)
-✔ Detect improper pivot table structures
-✔ Identify enum and boolean overuse
-✔ Detect mixed domain columns (e.g., info/data/details in varchar)
-✔ Check for missing soft deletes and timestamps
-✔ Detect status columns missing indexes
-✔ Detect polymorphic relation overuse and missing indexes
-✔ Lightweight and optimized for fast schema scanning
-✔ Supports Laravel 9, 10, and 11 with PHP 8+ compatibility
-✔ CLI-based analysis with structured categorized output
+- Analyze full database schema structure
+- Detect missing indexes on foreign keys and log tables
+- Identify nullable column overuse and high NULL value ratios
+- Detect normalization and integrity issues (duplicate rows, orphan risks, improper foreign key naming)
+- Audit trail checks (created_by, updated_by, deleted_by columns)
+- Detect repeated common fields across tables
+- Identify tables with too many columns or wide VARCHARs
+- Highlight performance risks (large TEXT columns, JSON overuse, unbounded growth, table size)
+- Detect improper pivot table structures
+- Identify enum and boolean overuse
+- Detect mixed domain columns (e.g., info/data/details in varchar)
+- Check for missing soft deletes and timestamps
+- Detect status columns missing indexes
+- Detect polymorphic relation overuse and missing indexes
+- Lightweight and optimized for fast schema scanning
+- Supports Laravel 9, 10, and 11 with PHP 8+ compatibility
+- CLI-based analysis with structured categorized output
 
 ---
 
@@ -97,7 +97,31 @@ composer require itpathsolutions/dbstan
 
 ## **Commands**
 
-### **Run Analysis**
+### **Vendor publish(Optional)**
+
+After installing the package, you may publish the configuration file using:
+
+```bash
+php artisan vendor:publish --tag=dbstan-config
+```
+
+This will create the configuration file at:
+
+```bash
+config/dbstan.php
+```
+
+You can customize thresholds like:
+
+- Maximum columns per table
+- Maximum VARCHAR length
+- JSON column limits
+- Large table size threshold
+- Nullable ratio threshold
+
+---
+
+### **Run Analysis for Production**
 
 To analyze your database schema:
 
@@ -106,6 +130,18 @@ php artisan dbstan:analyze
 ```
 
 This command scans your entire database and displays categorized results in the terminal.
+
+---
+
+### **Route for local or stage**
+
+To analyze your database schema:
+
+```bash
+http://127.0.0.1:8000/dbstan
+```
+
+This url scans your entire database and displays categorized results in the browser.
 
 ---
 
