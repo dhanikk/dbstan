@@ -14,11 +14,6 @@ class DBStanServiceProvider extends ServiceProvider {
             __DIR__.'/../config/dbstan.php',
             'dbstan'
         );
-        if ($this->app->environment(['local', 'staging'])) {
-
-            $this->loadRoutesFrom(__DIR__.'/routes/web.php');
-            $this->loadViewsFrom(__DIR__.'/resources/views', 'dbstan');
-        }
 
         // Vendor publish for config
         $this->publishes([
@@ -27,13 +22,13 @@ class DBStanServiceProvider extends ServiceProvider {
 
         // php artisan vendor:publish --tag=dbstan-config
 
-        if ($this->app->environment('production')) {
-            if ($this->app->runningInConsole()) {
-                $this->commands([
-                    \Itpathsolutions\DBStan\Commands\DBStanAnalyze::class,
-                ]);
-            }
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Itpathsolutions\DBStan\Commands\DBStanAnalyze::class,
+            ]);
         }
+        $this->loadRoutesFrom(__DIR__.'/routes/web.php');
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'dbstan');
     }
 }
 ?>
