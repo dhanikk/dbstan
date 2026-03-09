@@ -43,7 +43,8 @@ Do **NOT** expose this tool publicly in production without proper access restric
 - [Supported Versions](#supported-versions)  
 - [Installation](#installation)  
 - [Commands](#commands)  
-    - [Run Analysis](#run-analysis)  
+    - [Vendor Publish (Optional)](#vendor-publish-optional)  
+    - [Run Analysis for Production](#run-analysis-for-production)  
     - [Export Report](#export-report)  
 - [Output Categories](#output-categories)  
 - [Environment Configuration](#environment-configuration)  
@@ -51,8 +52,7 @@ Do **NOT** expose this tool publicly in production without proper access restric
 - [Contributing](#contributing)  
 - [Security Vulnerabilities](#security-vulnerabilities)  
 - [License](#license)  
-- [Testing](#testing)  
-- [Support](#get-support)  
+- [Testing](#testing)
 
 ---
 
@@ -97,7 +97,7 @@ composer require itpathsolutions/dbstan
 
 ## **Commands**
 
-### **Vendor publish(Optional)**
+### **Vendor Publish (Optional)**
 
 After installing the package, you may publish the configuration file using:
 
@@ -136,6 +136,52 @@ http://127.0.0.1:8000/dbstan
 ```
 
 These both scans your entire database and displays categorized results in the browser or terminal.
+
+---
+
+### **Export Report**
+
+Currently, DBStan displays analysis results in the terminal or browser.
+
+Future versions may support exporting reports to JSON, HTML, or PDF formats.
+
+---
+
+## **Output Categories**
+
+DBStan organizes its findings into four main categories:
+
+### 1. **Structure Issues**
+- Tables with too many columns
+- Wide VARCHAR fields
+- Missing timestamps or soft deletes
+- Boolean and enum overuse
+- Nullable column overuse
+- Large TEXT columns
+- Data type appropriateness
+- Mixed domain columns
+- Repeated common fields across tables
+- Pivot table structure issues
+
+### 2. **Integrity Issues**
+- Duplicate rows detection
+- Foreign key naming inconsistencies
+- Cascading action problems
+- Possible orphan risks
+- Unique constraint violations
+
+### 3. **Performance Issues**
+- Missing indexes on foreign keys
+- Missing indexes on log tables
+- Missing indexes on status columns
+- High NULL value ratios
+- Table size analysis
+- Unbounded growth risks
+
+### 4. **Architecture Issues**
+- Audit trail implementation (created_by, updated_by, deleted_by)
+- JSON column overuse
+- Polymorphic relation overuse
 
 ---
 
@@ -179,3 +225,57 @@ It does **NOT** make any changes to your database.
 
 Yes, but it is recommended to use it in development or staging environments.  
 Avoid exposing schema analysis publicly.
+
+---
+
+## **Contributing**
+
+Contributions are welcome!  
+
+If you'd like to contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
+
+Please ensure:
+- Your code follows PSR-12 coding standards
+- All tests pass before submitting
+- You include tests for new features
+
+For major changes, please open an issue first to discuss what you would like to change.
+
+---
+
+## **Security Vulnerabilities**
+
+If you discover a security vulnerability within DBStan, please send an email to [enquiry@itpathsolutions.com](mailto:enquiry@itpathsolutions.com).  
+
+All security vulnerabilities will be promptly addressed.
+
+For more details, see our [Security Policy](SECURITY.md).
+
+---
+
+## **License**
+
+DBStan is open-sourced software licensed under the [MIT license](LICENSE).
+
+---
+
+## **Testing**
+
+Currently, this package does not include automated tests.
+
+Future versions will include:
+- Unit tests for individual check classes
+- Integration tests for database analysis
+- Feature tests for CLI commands
+
+To run tests (when available):
+
+```bash
+composer test
+```
