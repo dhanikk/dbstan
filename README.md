@@ -51,8 +51,7 @@ Do **NOT** expose this tool publicly in production without proper access restric
 - [FAQs](#faqs)  
 - [Contributing](#contributing)  
 - [Security Vulnerabilities](#security-vulnerabilities)  
-- [License](#license)  
-- [Testing](#testing)
+- [License](#license)
 
 ---
 
@@ -262,20 +261,3 @@ For more details, see our [Security Policy](SECURITY.md).
 ## **License**
 
 DBStan is open-sourced software licensed under the [MIT license](LICENSE).
-
----
-
-## **Testing**
-
-Currently, this package does not include automated tests.
-
-Future versions will include:
-- Unit tests for individual check classes
-- Integration tests for database analysis
-- Feature tests for CLI commands
-
-To run tests (when available):
-
-```bash
-composer test
-```
