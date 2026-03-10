@@ -39,7 +39,7 @@ class ForeignKeyNamingCheck extends BaseCheck
                     $fieldLower !== 'id'
                 ) {
                     $issues["fk_naming"][] =
-                        "🧱 [NAMING] '$table.$field' column should follow foreign key naming convention: use '{$fieldLower}_id'";
+                        "\033[0;30;43m[NAMING]\033[0m '$table.$field' column should follow foreign key naming convention: use '{$fieldLower}_id'";
                 }
             }
         }

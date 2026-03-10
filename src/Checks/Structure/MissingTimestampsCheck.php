@@ -31,7 +31,7 @@ class MissingTimestampsCheck extends BaseCheck
                 !in_array('updated_at', $columns)
             ) {
                 $issues["missing_timestamps"][] =
-                    "⏰ [BEST PRACTICE] '$table' table is missing created_at/updated_at timestamp columns";
+                  "\033[0;30;43m[BEST PRACTICE]\033[0m '$table' table is missing created_at/updated_at timestamp columns";
             }
         }
 

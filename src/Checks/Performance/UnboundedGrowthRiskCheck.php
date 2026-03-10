@@ -52,7 +52,7 @@ class UnboundedGrowthRiskCheck extends BaseCheck
                 !in_array('created_at', $indexColumns)
             ) {
                 $issues["growth_risk"][] =
-                    "📈 [GROWTH RISK] '$table.created_at' column should be indexed to support high-growth queries";
+                    "\033[0;30;43m[GROWTH RISK]\033[0m '$table.created_at' column should be indexed to support high-growth queries";
             }
         }
 

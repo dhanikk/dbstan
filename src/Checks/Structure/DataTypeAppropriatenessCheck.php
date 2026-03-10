@@ -31,7 +31,7 @@ class DataTypeAppropriatenessCheck extends BaseCheck
                     str_contains(strtolower($column->Type), 'int')
                 ) {
                     $issues["datatype_issue"][] =
-                        "💰 [DATA TYPE] '$table.{$column->Field}' column should use DECIMAL instead of INT";
+                        "\033[0;30;43m[DATA TYPE]\033[0m '$table.{$column->Field}' column should use DECIMAL instead of INT";
                 }
             }
         }

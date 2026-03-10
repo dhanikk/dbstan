@@ -48,7 +48,7 @@ class TableSizeAnalysisCheck extends BaseCheck
 
             if ($sizeMB > $thresholdMB) {
                 $issues["size_alert"][] =
-                    "📊 [SIZE ALERT] '$table' table is {$sizeMB}MB — review indexing, archiving, or partitioning strategy";
+                   "\033[0;30;43m[SIZE ALERT]\033[0m '$table' table is {$sizeMB}MB — review indexing, archiving, or partitioning strategy";
             }
         }
 

@@ -30,7 +30,7 @@ class TooManyColumnsCheck extends BaseCheck
 
             if ($columnCount > $maxColumns) {
 
-                $issues["too_many_columns"][] = "⚠️  [WARNING] '$table' table has too many columns ($columnCount)";
+                $issues["too_many_columns"][] = "\033[0;30;43m[WARNING]\033[0m '$table' table has too many columns ($columnCount)";
             }
         }
 

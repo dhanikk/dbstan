@@ -32,7 +32,7 @@ class NullableOveruseCheck extends BaseCheck
                     !$this->isNullableJustified($column)
                 ) {
                     $issues["nullable_overuse"][] =
-                        "❓ [NULLABLE] '$table.{$column->Field}' column is nullable without clear reason";
+                        "\033[0;30;43m[NULLABLE]\033[0m '$table.{$column->Field}' column is nullable without clear reason";
                 }
             }
         }

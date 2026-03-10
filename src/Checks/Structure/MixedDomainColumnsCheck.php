@@ -27,7 +27,7 @@ class MixedDomainColumnsCheck extends BaseCheck
                 if ($this->isMixedDomain($column)) {
 
                     $issues["mixed_domain"][] =
-                        "🔀 [DOMAIN MIX] '$table.{$column->Field}' column mixes different types of data";
+                        "\033[0;37;45m[DOMAIN MIX]\033[0m '$table.{$column->Field}' column mixes different types of data";
                 }
             }
         }

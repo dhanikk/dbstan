@@ -46,7 +46,7 @@ class UniqueConstraintViolationsCheck extends BaseCheck
                 if ($duplicateExists) {
 
                     $issues["duplicate_values"][] =
-                        "🚨 [UNIQUE VIOLATION] '$table.$field' column has duplicate values";
+                        "\033[0;37;41m[UNIQUE VIOLATION]\033[0m '$table.$field' column has duplicate values";
                 }
             }
         }

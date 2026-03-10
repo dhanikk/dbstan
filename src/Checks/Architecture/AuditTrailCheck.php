@@ -46,19 +46,19 @@ class AuditTrailCheck extends BaseCheck
             // Rule 1: Missing timestamps
             if (!$hasCreatedAt || !$hasUpdatedAt) {
                 $issues["audit_missing_timestamps"][] =
-                    "🕵️ [AUDIT] '$table' table should have created_by and updated_by for audit tracking";
+                    "\033[0;30;43m[AUDIT]\033[0m '$table' table should have created_by and updated_by for audit tracking";
             }
 
             // Rule 2: Soft delete without timestamps
             if ($hasDeletedAt && (!$hasUpdatedAt || !$hasCreatedAt)) {
                 $issues["audit_inconsistent"][] =
-                    "⚠️  [AUDIT] '$table' table has deleted_by but missing created_by or updated_by";
+                    "\033[0;30;43m[AUDIT]\033[0m '$table' table has deleted_by but missing created_by or updated_by";
             }
 
             // Rule 3: Timestamps without soft delete
             if (($hasCreatedAt || $hasUpdatedAt) && !$hasDeletedAt) {
                 $issues["audit_no_soft_delete"][] =
-                    "⚠️  [AUDIT] '$table' table has created_by/updated_by but missing deleted_by for soft delete";
+                    "\033[0;30;43m[AUDIT]\033[0m '$table' table has created_by/updated_by but missing deleted_by for soft delete";
             }
         }
 

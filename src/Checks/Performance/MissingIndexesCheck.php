@@ -34,7 +34,7 @@ class MissingIndexesCheck extends BaseCheck
                     !in_array($column->Field, $indexColumns)
                 ) {
                     $issues["missing_index"][] =
-                        "❌ [ERROR] '$table.{$column->Field}' column looks like FK but has no index";
+                        "\033[0;37;41m[ERROR]\033[0m '$table.{$column->Field}' column looks like FK but has no index";
                 }
             }
         }

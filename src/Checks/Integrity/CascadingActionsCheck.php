@@ -51,7 +51,7 @@ class CascadingActionsCheck extends BaseCheck
             if (in_array($deleteRule, ['NO ACTION', 'RESTRICT'])) {
 
                 $issues["cascade_missing"][] =
-                    "🧨 [INTEGRITY] '{$fk->TABLE_NAME}.{$fk->COLUMN_NAME}' column has {$deleteRule} on delete — review cascading strategy";
+                    "\033[0;37;41m[INTEGRITY]\033[0m '{$fk->TABLE_NAME}.{$fk->COLUMN_NAME}' column has {$deleteRule} on delete — review cascading strategy";
             }
         }
 

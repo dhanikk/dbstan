@@ -57,13 +57,13 @@ class PivotTableStructureCheck extends BaseCheck
                 // 1️⃣ ID column check
                 if ($hasId) {
                     $issues["pivot_structure"][] =
-                        "⚠️  [PIVOT] '$table' table should not contain an 'id' column";
+                        "\033[0;30;43m[PIVOT]\033[0m '$table' table should not contain an 'id' column";
                 }
 
                 // 2️⃣ Timestamp check
                 if ($hasTimestamps) {
                     $issues["pivot_structure"][] =
-                        "⚠️  [PIVOT] '$table' table should not contain timestamps";
+                        "\033[0;30;43m[PIVOT]\033[0m '$table' table should not contain timestamps";
                 }
 
                 // 3️⃣ Extra columns check
@@ -74,8 +74,7 @@ class PivotTableStructureCheck extends BaseCheck
 
                 if (!empty($extraColumns)) {
                     $issues["pivot_structure"][] =
-                        "🔗 [PIVOT DESIGN] '$table' table looks like pivot but contains extra columns: " .
-                        implode(', ', $extraColumns);
+                       "\033[0;30;43m[PIVOT DESIGN]\033[0m '$table' table looks like pivot but contains extra columns: " .implode(', ', $extraColumns);
                 }
             }
         }

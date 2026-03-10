@@ -50,7 +50,7 @@ class PolymorphicOveruseCheck extends BaseCheck
 
                         if (!$hasIndex) {
                             $issues["polymorphic_index"][] =
-                                "⚡ [PERF] '$table' table has unindexed polymorphic relation ($field, $relatedId)";
+                                "\033[0;33;44m[PERF]\033[0m '$table' table has unindexed polymorphic relation ($field, $relatedId)";
                         }
                     }
                 }
@@ -59,7 +59,7 @@ class PolymorphicOveruseCheck extends BaseCheck
             // Overuse warning
             if (count($polymorphicPairs) > 1) {
                 $issues["polymorphic_overuse"][] =
-                    "🧬 [ARCH RISK] '$table' table uses multiple polymorphic relations (" . count($polymorphicPairs) . ")";
+                    "\033[0;37;41m[ARCH RISK]\033[0m '$table' table uses multiple polymorphic relations (" . count($polymorphicPairs) . ")";
             }
         }
 

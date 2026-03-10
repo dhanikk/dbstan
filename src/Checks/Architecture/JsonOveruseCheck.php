@@ -33,7 +33,7 @@ class JsonOveruseCheck extends BaseCheck
             if (count($jsonColumns) > $maxJsonColumns) {
 
                 $issues["json_overuse"][] =
-                    "⚠️  [WARNING] '$table' table uses too many JSON columns (" . count($jsonColumns) . ")";
+                    "\033[0;30;43m[WARNING]\033[0m '$table' table uses too many JSON columns (" . count($jsonColumns) . ")";
             }
         }
 

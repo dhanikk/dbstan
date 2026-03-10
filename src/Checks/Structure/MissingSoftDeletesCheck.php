@@ -30,7 +30,7 @@ class MissingSoftDeletesCheck extends BaseCheck
                 !in_array('deleted_at', $columns)
             ) {
                 $issues["missing_soft_deletes"][] =
-                    "⏰ [BEST PRACTICE] '$table' table is missing deleted_at column for soft deletes";
+                    "\033[0;30;43m[BEST PRACTICE]\033[0m '$table' table is missing deleted_at column for soft deletes";
             }
         }
 

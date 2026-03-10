@@ -43,7 +43,7 @@ class DuplicateRowsCheck extends BaseCheck
             if (!$hasPrimary && !$hasUnique) {
 
                 $issues["duplicate_rows_risk"][] =
-                    "⚠️  [DATA INTEGRITY] '$table' table has no PRIMARY or UNIQUE constraint — duplicate rows possible";
+                    "\033[0;30;43m[DATA INTEGRITY]\033[0m '$table' table has no PRIMARY or UNIQUE constraint — duplicate rows possible";
             }
         }
 

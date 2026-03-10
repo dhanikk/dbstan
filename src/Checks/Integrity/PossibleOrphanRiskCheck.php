@@ -58,19 +58,19 @@ class PossibleOrphanRiskCheck extends BaseCheck
                 // Case 1: No FK constraint at all
                 if (!$hasFkConstraint) {
                     $issues["orphan_missing_constraint"][] =
-                        "⚠️  [ORPHAN RISK] '$table.{$column->Field}' column has no foreign key constraint";
+                        "\033[0;30;43m[ORPHAN RISK]\033[0m '$table.{$column->Field}' column has no foreign key constraint";
                 }
 
                 // Case 2: Nullable FK (soft orphan risk)
                 if ($hasFkConstraint && $isNullable) {
                     $issues["orphan_nullable_fk"][] =
-                        "👻 [DATA RISK] '$table.{$column->Field}' column is nullable foreign key — may allow logical orphans";
+                        "\033[0;37;41m[DATA RISK]\033[0m '$table.{$column->Field}' column is nullable foreign key — may allow logical orphans";
                 }
 
                 // Case 3: Worst case (nullable + no constraint)
                 if (!$hasFkConstraint && $isNullable) {
                     $issues["orphan_high_risk"][] =
-                        "🔥 [HIGH RISK] '$table.{$column->Field}' column is nullable and has no FK constraint";
+                        "\033[0;37;41m[HIGH RISK]\033[0m '$table.{$column->Field}' column is nullable and has no FK constraint";
                 }
             }
         }

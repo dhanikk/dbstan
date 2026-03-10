@@ -40,7 +40,7 @@ class BooleanOveruseCheck extends BaseCheck
 
             if ($count > 4) {
                 $issues["boolean_overuse"][] =
-                    "⚠️  [ARCH WARNING] '$table' table has many boolean flags ($count). Consider using status ENUM or state machine.";
+                    "\033[0;30;43m[ARCH WARNING]\033[0m '$table' table has many boolean flags ($count). Consider using status ENUM or state machine.";
             }
         }
 

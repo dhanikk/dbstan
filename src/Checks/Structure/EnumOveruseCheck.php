@@ -36,7 +36,7 @@ class EnumOveruseCheck extends BaseCheck
             // Rule 1: Too many ENUM columns in one table
             if (count($enumColumns) > 2) {
                 $issues["enum_overuse"][] =
-                    "⚠️  [ENUM OVERUSE] '$table' table has multiple ENUM columns (" . count($enumColumns) . ")";
+                    "\033[0;30;43m[ENUM OVERUSE]\033[0m '$table' table has multiple ENUM columns (" . count($enumColumns) . ")";
             }
 
             // Rule 2: ENUM with too many values
@@ -47,7 +47,7 @@ class EnumOveruseCheck extends BaseCheck
 
                 if ($valuesCount > 5) {
                     $issues["enum_overuse"][] =
-                        "⚠️  [ENUM SIZE] '$table.{$column->Field}' column has many ENUM values ($valuesCount) — consider lookup table";
+                        "\033[0;30;43m[ENUM SIZE]\033[0m '$table.{$column->Field}' column has many ENUM values ($valuesCount) — consider lookup table";
                 }
             }
         }

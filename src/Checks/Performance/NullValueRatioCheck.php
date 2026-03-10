@@ -50,7 +50,7 @@ class NullValueRatioCheck extends BaseCheck
                     $percentage = round($ratio * 100, 2);
 
                     $issues["high_null_ratio"][] =
-                        "⚠️  [DATA QUALITY] '$table.{$column->Field}' column has high NULL ratio ({$percentage}%)";
+                        "\033[0;30;43m[DATA QUALITY]\033[0m '$table.{$column->Field}' column has high NULL ratio ({$percentage}%)";
                 }
             }
         }

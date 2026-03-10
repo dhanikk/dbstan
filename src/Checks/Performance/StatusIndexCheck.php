@@ -38,7 +38,7 @@ class StatusIndexCheck extends BaseCheck
 
                 if ($isStatusColumn && !in_array($column, $indexes)) {
                     $issues["status_not_indexed"][] =
-                        "📌 [PERF] '$table.$column' column should be indexed for filtering queries";
+                        "\033[0;30;43m[PERF]\033[0m '$table.$column' column should be indexed for filtering queries";
                 }
             }
         }

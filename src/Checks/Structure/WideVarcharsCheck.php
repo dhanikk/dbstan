@@ -35,7 +35,7 @@ class WideVarcharsCheck extends BaseCheck
 
                     if ($length > $maxLength) {
 
-                        $issues["wide_varchar"][] = "📏 [WARNING] '$table.{$column->Field}' column is VARCHAR($length) exceeds recommended limit ($maxLength)";
+                        $issues["wide_varchar"][] = "\033[0;30;43m[WARNING]\033[0m '$table.{$column->Field}' column is VARCHAR($length) exceeds recommended limit ($maxLength)";
                     }
                 }
             }

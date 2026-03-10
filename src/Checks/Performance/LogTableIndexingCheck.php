@@ -37,7 +37,7 @@ class LogTableIndexingCheck extends BaseCheck
                 !in_array('created_at', $indexColumns)) {
 
                 $issues["log_indexing"][] =
-                    "🚀 [PERFORMANCE] '$table.created_at' column should be indexed for faster log queries";
+                    "\033[0;30;43m[PERFORMANCE]\033[0m '$table.created_at' column should be indexed for faster log queries";
             }
 
             // Check user_id index (if exists)
@@ -45,7 +45,7 @@ class LogTableIndexingCheck extends BaseCheck
                 !in_array('user_id', $indexColumns)) {
 
                 $issues["log_indexing"][] =
-                    "🚀 [PERFORMANCE] '$table.user_id' column should be indexed in log table";
+                    "\033[0;30;43m[PERFORMANCE]\033[0m '$table.user_id' column should be indexed in log table";
             }
         }
 

@@ -33,7 +33,7 @@ class RepeatedCommonFieldsCheck extends BaseCheck
                 if (in_array($field, $columns)) {
 
                     $issues["repeated_common_field"][] =
-                        "🔁 [REPEATED FIELD] '$table' table has common field '$field'";
+                        "\033[0;30;43m[REPEATED FIELD]\033[0m '$table' table has common field '$field'";
                 }
             }
         }

@@ -29,7 +29,7 @@ class LargeTextColumnsCheck extends BaseCheck
                 if (str_contains(strtolower($column->Type), 'text')) {
 
                     $issues["large_text"][] =
-                        "📦 [PERF RISK] '$table.{$column->Field}' column is TEXT — consider splitting table";
+                        "\033[0;30;43m[PERF RISK]\033[0m '$table.{$column->Field}' column is TEXT — consider splitting table";
                 }
             }
         }
