@@ -53,6 +53,12 @@
 
     <h2 class="mb-4 fw-bold">⚡ DBStan Analysis</h2>
 
+    @if(!empty($preflightError))
+        <div class="alert alert-danger shadow-sm">
+            {{ $preflightError }}
+        </div>
+    @endif
+
     <?php
         // Define tag colors **once** here — easy to maintain
         $tagColors = [
@@ -84,7 +90,7 @@
         ];
     ?>
 
-    @if(count($groupedIssues) > 0)
+    @if(empty($preflightError) && count($groupedIssues) > 0)
         <div class="row">
             <!-- Left Side Vertical Tabs -->
             <div class="col-md-3">
@@ -162,7 +168,7 @@
                 </div>
             </div>
         </div>
-    @else
+    @elseif(empty($preflightError))
         <div class="alert alert-success shadow-sm">
             No issues found. Great job!
         </div>

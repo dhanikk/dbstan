@@ -11,9 +11,17 @@ class DBStanController extends Controller
     public function index()
     {
         $analyzer = new DBStanAnalyzer();
+        $preflightError = $analyzer->getPreflightError();
 
-        $groupedIssues = $analyzer->analyze();
+        $groupedIssues = $preflightError === null
+            ? $analyzer->analyze()
+            : [
+                'structure' => [],
+                'integrity' => [],
+                'performance' => [],
+                'architecture' => [],
+            ];
 
-        return view('dbstan::dbstan_issue_list', compact('groupedIssues'));
+        return view('dbstan::dbstan_issue_list', compact('groupedIssues', 'preflightError'));
     }
 }

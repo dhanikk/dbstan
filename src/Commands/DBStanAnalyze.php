@@ -26,6 +26,16 @@ class DBStanAnalyze extends Command
      */
     public function handle()
     {
+        $analyzer = new DBStanAnalyzer();
+        $preflightError = $analyzer->getPreflightError();
+
+        if ($preflightError !== null) {
+            $this->newLine();
+            $this->error($preflightError);
+            $this->line('DBStan analysis was skipped until the above issue is fixed.');
+            return self::FAILURE;
+        }
+
         $this->newLine();
         $this->info('🔍 Starting DBStan database structure analysis...');
 
@@ -36,7 +46,6 @@ class DBStanAnalyze extends Command
         $bar->start();
         $bar->setMessage('Collecting table metadata...', 'status');
 
-        $analyzer = new DBStanAnalyzer();
         $bar->advance(1); sleep(1); $bar->setMessage('Analyzing table structures...', 'status');
         $bar->advance(1); sleep(1); $bar->setMessage('Checking column types & nullability...', 'status');
         $bar->advance(1); sleep(1); $bar->setMessage('Collecting indexes & constraints...', 'status');

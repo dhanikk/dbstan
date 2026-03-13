@@ -43,9 +43,8 @@ Do **NOT** expose this tool publicly in production without proper access restric
 - [Supported Versions](#supported-versions)  
 - [Installation](#installation)  
 - [Commands](#commands)  
-    - [Vendor Publish (Optional)](#vendor-publish-optional)  
+    - [Vendor Publish](#vendor-publish)  
     - [Run Analysis for Production](#run-analysis-for-production)  
-    - [Export Report](#export-report)  
 - [Output Categories](#output-categories)  
 - [Environment Configuration](#environment-configuration)  
 - [FAQs](#faqs)  
@@ -72,15 +71,15 @@ Do **NOT** expose this tool publicly in production without proper access restric
 - Detect status columns missing indexes
 - Detect polymorphic relation overuse and missing indexes
 - Lightweight and optimized for fast schema scanning
-- Supports Laravel 9, 10, and 11 with PHP 8+ compatibility
+- Supports Laravel 9, 10, 11, and 12 with PHP 8.1+ compatibility
 - CLI-based analysis with structured categorized output
 
 ---
 
 ## **Supported Versions**
 
-- **PHP:** ^8.0  
-- **Illuminate Support:** ^9.0 | ^10.0 | ^11.0  
+- **PHP:** ^8.1 | ^8.2 | ^8.3 | ^8.4  
+- **Illuminate Support:** ^9.0 | ^10.0 | ^11.0 | ^12.0  
 
 ---
 
@@ -92,17 +91,21 @@ To install the package, run:
 composer require itpathsolutions/dbstan
 ```
 
+<button type="button" onclick="navigator.clipboard.writeText('composer require itpathsolutions/dbstan')">Copy Install Command</button>
+
 ---
 
 ## **Commands**
 
-### **Vendor Publish (Optional)**
+### **Vendor Publish**
 
 After installing the package, you may publish the configuration file using:
 
 ```bash
 php artisan vendor:publish --tag=dbstan-config
 ```
+
+<button type="button" onclick="navigator.clipboard.writeText('php artisan vendor:publish --tag=dbstan-config')">Copy Vendor Publish Command</button>
 
 This will create the configuration file at:
 
@@ -134,15 +137,7 @@ or
 http://127.0.0.1:8000/dbstan
 ```
 
-These both scans your entire database and displays categorized results in the browser or terminal.
-
----
-
-### **Export Report**
-
-Currently, DBStan displays analysis results in the terminal or browser.
-
-Future versions may support exporting reports to JSON, HTML, or PDF formats.
+Both options scan your entire database and display categorized results in the browser or terminal.
 
 ---
 

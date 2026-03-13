@@ -4,6 +4,7 @@ namespace Itpathsolutions\DBStan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Itpathsolutions\DBStan\Contracts\CheckInterface;
+use Throwable;
 
 class DBStanAnalyzer
 {
@@ -15,6 +16,35 @@ class DBStanAnalyzer
     public function __construct()
     {
         $this->loadChecks();
+    }
+
+    /**
+     * Validate DB configuration/connection and migration state before analysis.
+     */
+    public function getPreflightError(): ?string
+    {
+        $databaseName = DB::getDatabaseName();
+
+        if (empty($databaseName)) {
+            return 'Database is not configured. Please set DB connection values in your .env file and try again.';
+        }
+
+        try {
+            DB::connection()->getPdo();
+        } catch (Throwable $e) {
+            return 'Unable to connect to the configured database. Please verify your .env DB credentials and ensure the database server is running.';
+        }
+
+        if (!DB::getSchemaBuilder()->hasTable('migrations')) {
+            return 'Migrations table was not found. Please run migration first: php artisan migrate';
+        }
+
+        $migrationsCount = (int) DB::table('migrations')->count();
+        if ($migrationsCount === 0) {
+            return 'No migrations have been applied yet. Please run migration first: php artisan migrate';
+        }
+
+        return null;
     }
 
     /**
@@ -74,6 +104,16 @@ class DBStanAnalyzer
      */
     public function analyze(): array
     {
+        $preflightError = $this->getPreflightError();
+        if ($preflightError !== null) {
+            return [
+                'structure' => [],
+                'integrity' => [],
+                'performance' => [],
+                'architecture' => [],
+            ];
+        }
+
         $schema = $this->extractSchema();
 
         $groupedIssues = [
