@@ -155,16 +155,37 @@ class DBStanAnalyzer
     {
         $tables = DB::select('SHOW TABLES');
         $dbNameKey = 'Tables_in_' . DB::getDatabaseName();
+        $databaseName = DB::getDatabaseName();
+
+        $tableMetaRows = DB::select(
+            'SELECT TABLE_NAME, ENGINE, TABLE_COLLATION, TABLE_ROWS, AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?',
+            [$databaseName]
+        );
+
+        $tableMeta = [];
+        foreach ($tableMetaRows as $row) {
+            $tableMeta[$row->TABLE_NAME] = [
+                'engine' => $row->ENGINE ?? null,
+                'table_collation' => $row->TABLE_COLLATION ?? null,
+                'table_rows' => (int) ($row->TABLE_ROWS ?? 0),
+                'auto_increment' => $row->AUTO_INCREMENT !== null ? (int) $row->AUTO_INCREMENT : null,
+            ];
+        }
 
         $schema = [];
 
         foreach ($tables as $tableObj) {
 
             $tableName = $tableObj->$dbNameKey;
+            $meta = $tableMeta[$tableName] ?? [];
 
             $schema[$tableName] = [
-                'columns' => DB::select("SHOW COLUMNS FROM `$tableName`"),
+                'columns' => DB::select("SHOW FULL COLUMNS FROM `$tableName`"),
                 'indexes' => DB::select("SHOW INDEX FROM `$tableName`"),
+                'engine' => $meta['engine'] ?? null,
+                'table_collation' => $meta['table_collation'] ?? null,
+                'table_rows' => $meta['table_rows'] ?? 0,
+                'auto_increment' => $meta['auto_increment'] ?? null,
             ];
         }
 

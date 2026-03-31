@@ -22,7 +22,6 @@ class PivotTableStructureCheck extends BaseCheck
      * A proper pivot table:
      * - Has exactly 2 foreign key columns (ending with _id)
      * - Should NOT have an 'id' column
-     * - Should NOT have timestamps
      * - Should NOT have extra business columns
      */
     public function run(array $schema): array
@@ -50,26 +49,16 @@ class PivotTableStructureCheck extends BaseCheck
 
                 $hasId = in_array('id', $columnNames);
 
-                $hasTimestamps =
-                    in_array('created_at', $columnNames) ||
-                    in_array('updated_at', $columnNames);
-
                 // 1️⃣ ID column check
                 if ($hasId) {
                     $issues["pivot_structure"][] =
                         "\033[0;30;43m[PIVOT]\033[0m '$table' table should not contain an 'id' column";
                 }
 
-                // 2️⃣ Timestamp check
-                if ($hasTimestamps) {
-                    $issues["pivot_structure"][] =
-                        "\033[0;30;43m[PIVOT]\033[0m '$table' table should not contain timestamps";
-                }
-
-                // 3️⃣ Extra columns check
+                // 2️⃣ Extra columns check
                 $extraColumns = array_diff(
                     $nonFkColumns,
-                    ['id', 'created_at', 'updated_at']
+                    ['id']
                 );
 
                 if (!empty($extraColumns)) {

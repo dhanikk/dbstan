@@ -23,7 +23,10 @@ class TableSizeAnalysisCheck extends BaseCheck
     public function run(array $schema): array
     {
         $issues = [];
-        $thresholdMB = 100;
+        $tableThresholdMB = (float) ($this->config['large_table_mb'] ?? 100);
+        $databaseThresholdMB = (float) ($this->config['database_size_mb'] ?? 2048);
+        $dominanceRatio = (float) ($this->config['table_dominance_ratio'] ?? 0.40);
+        $unusualTableRatio = (float) ($this->config['unusually_large_table_ratio'] ?? 0.20);
 
         $database = DB::getDatabaseName();
 
@@ -31,24 +34,51 @@ class TableSizeAnalysisCheck extends BaseCheck
         $tables = DB::select("
             SELECT 
                 TABLE_NAME,
-                ROUND((DATA_LENGTH + INDEX_LENGTH)/1024/1024, 2) AS size_mb
+                ROUND((DATA_LENGTH)/1024/1024, 2) AS data_mb,
+                ROUND((INDEX_LENGTH)/1024/1024, 2) AS index_mb,
+                ROUND((DATA_LENGTH + INDEX_LENGTH)/1024/1024, 2) AS total_mb
             FROM information_schema.TABLES
             WHERE TABLE_SCHEMA = ?
         ", [$database]);
 
+        $dbTotalMB = 0.0;
+
         // Convert result to associative array
         $sizes = [];
         foreach ($tables as $row) {
-            $sizes[$row->TABLE_NAME] = $row->size_mb ?? 0;
+            $tableTotalMB = (float) ($row->total_mb ?? 0);
+            $sizes[$row->TABLE_NAME] = [
+                'data_mb' => (float) ($row->data_mb ?? 0),
+                'index_mb' => (float) ($row->index_mb ?? 0),
+                'total_mb' => $tableTotalMB,
+            ];
+            $dbTotalMB += $tableTotalMB;
+        }
+
+        if ($dbTotalMB > $databaseThresholdMB) {
+            $issues['database_size_alert'][] =
+                "\033[0;30;43m[SIZE ALERT]\033[0m Database size is " . round($dbTotalMB, 2) . "MB (threshold: {$databaseThresholdMB}MB). Consider archiving historical data, partitioning large tables, and validating index bloat";
         }
 
         foreach (array_keys($schema) as $table) {
 
-            $sizeMB = $sizes[$table] ?? 0;
+            $sizeMeta = $sizes[$table] ?? ['data_mb' => 0.0, 'index_mb' => 0.0, 'total_mb' => 0.0];
+            $sizeMB = (float) $sizeMeta['total_mb'];
+            $ratio = $dbTotalMB > 0 ? ($sizeMB / $dbTotalMB) : 0;
 
-            if ($sizeMB > $thresholdMB) {
+            if ($sizeMB > $tableThresholdMB) {
                 $issues["size_alert"][] =
-                   "\033[0;30;43m[SIZE ALERT]\033[0m '$table' table is {$sizeMB}MB — review indexing, archiving, or partitioning strategy";
+                   "\033[0;30;43m[SIZE ALERT]\033[0m '$table' table is {$sizeMB}MB (data: {$sizeMeta['data_mb']}MB, indexes: {$sizeMeta['index_mb']}MB) — review indexing, archiving, or partitioning strategy";
+            }
+
+            if ($ratio >= $unusualTableRatio) {
+                $issues['unusually_large_table'][] =
+                    "\033[0;30;43m[WARNING]\033[0m '$table' stores " . round($ratio * 100, 2) . "% of total database size. Investigate retention/archival and query/index strategy";
+            }
+
+            if ($ratio >= $dominanceRatio) {
+                $issues['table_storage_dominance'][] =
+                    "\033[0;37;41m[ERROR]\033[0m '$table' dominates storage at " . round($ratio * 100, 2) . "% of database size. Prioritize optimization (partitioning, archival, and index cleanup)";
             }
         }
 

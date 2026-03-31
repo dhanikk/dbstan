@@ -63,11 +63,19 @@ Do **NOT** expose this tool publicly in production without proper access restric
 - Audit trail checks (created_by, updated_by, deleted_by columns)
 - Detect repeated common fields across tables
 - Identify tables with too many columns or wide VARCHARs
+- Detect tables missing a PRIMARY KEY
 - Highlight performance risks (large TEXT columns, JSON overuse, unbounded growth, table size)
+- Detect storage engine issues (non-InnoDB tables and mixed engines)
+- Detect charset/collation mismatches (utf8 vs utf8mb4 and inconsistent collations)
+- Analyze auto-increment overflow risk on high-growth tables
+- Identify low-cardinality indexes that may be ineffective
+- Recommend composite indexes for common filtering patterns (e.g., user_id + status)
+- Analyze overall database size and table storage dominance
 - Detect improper pivot table structures
 - Identify enum and boolean overuse
 - Detect mixed domain columns (e.g., info/data/details in varchar)
 - Check for missing soft deletes and timestamps
+- Detect datatype mismatch using column-name heuristics (price/amount, email, *_at, is_/has_)
 - Detect status columns missing indexes
 - Detect polymorphic relation overuse and missing indexes
 - Lightweight and optimized for fast schema scanning
@@ -119,7 +127,12 @@ You can customize thresholds like:
 - Maximum VARCHAR length
 - JSON column limits
 - Large table size threshold
+- Total database size threshold
+- Unusually large table ratio threshold
+- Table dominance ratio threshold
 - Nullable ratio threshold
+- Auto-increment risk thresholds
+- Index cardinality thresholds
 
 ---
 
@@ -153,6 +166,7 @@ DBStan organizes its findings into four main categories:
 - Nullable column overuse
 - Large TEXT columns
 - Data type appropriateness
+- Missing primary key detection
 - Mixed domain columns
 - Repeated common fields across tables
 - Pivot table structure issues
@@ -170,12 +184,20 @@ DBStan organizes its findings into four main categories:
 - Missing indexes on status columns
 - High NULL value ratios
 - Table size analysis
+- Database size threshold analysis
+- Unusually large table and table-dominance detection
+- Auto-increment overflow and growth risk analysis
+- Low-cardinality/useless index detection
+- High-cardinality index misuse heuristics (standalone status/flag indexes)
+- Composite index recommendations (user_id + status/state)
 - Unbounded growth risks
 
 ### 4. **Architecture Issues**
 - Audit trail implementation (created_by, updated_by, deleted_by)
 - JSON column overuse
 - Polymorphic relation overuse
+- Storage engine consistency (InnoDB and mixed-engine detection)
+- Charset and collation consistency checks
 
 ---
 
