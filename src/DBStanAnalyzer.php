@@ -24,7 +24,7 @@ class DBStanAnalyzer
     public function getPreflightError(): ?string
     {
         $databaseName = DB::getDatabaseName();
-        $migrationTableName = config('database.migrations', 'migration');
+        $migrationTableName = config('database.migrations', 'migrations');
 
         if (empty($databaseName)) {
             return 'Database is not configured. Please set DB connection values in your .env file and try again.';
