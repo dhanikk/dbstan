@@ -79,15 +79,15 @@ Do **NOT** expose this tool publicly in production without proper access restric
 - Detect status columns missing indexes
 - Detect polymorphic relation overuse and missing indexes
 - Lightweight and optimized for fast schema scanning
-- Supports Laravel 9, 10, 11, and 12 with PHP 8.1+ compatibility
+- Supports Laravel 9, 10, 11, 12, and 13 with PHP 8.1+ compatibility
 - CLI-based analysis with structured categorized output
 
 ---
 
 ## **Supported Versions**
 
-- **PHP:** ^8.1 | ^8.2 | ^8.3 | ^8.4  
-- **Illuminate Support:** ^9.0 | ^10.0 | ^11.0 | ^12.0  
+- **PHP:** ^8.1 | ^8.2 | ^8.3 | ^8.4 | ^8.5  
+- **Illuminate Support:** ^9.0 | ^10.0 | ^11.0 | ^12.0 | ^13.0  
 
 ---
 
