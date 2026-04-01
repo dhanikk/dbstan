@@ -24,6 +24,7 @@ class DBStanAnalyzer
     public function getPreflightError(): ?string
     {
         $databaseName = DB::getDatabaseName();
+        $migrationTableName = config('database.migrations', 'migrations');
 
         if (empty($databaseName)) {
             return 'Database is not configured. Please set DB connection values in your .env file and try again.';
@@ -35,11 +36,11 @@ class DBStanAnalyzer
             return 'Unable to connect to the configured database. Please verify your .env DB credentials and ensure the database server is running.';
         }
 
-        if (!DB::getSchemaBuilder()->hasTable('migrations')) {
+        if (!DB::getSchemaBuilder()->hasTable($migrationTableName)) {
             return 'Migrations table was not found. Please run migration first: php artisan migrate';
         }
 
-        $migrationsCount = (int) DB::table('migrations')->count();
+        $migrationsCount = (int) DB::table($migrationTableName)->count();
         if ($migrationsCount === 0) {
             return 'No migrations have been applied yet. Please run migration first: php artisan migrate';
         }
