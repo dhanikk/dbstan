@@ -24,7 +24,7 @@ class DBStanAnalyzer
     public function getPreflightError(): ?string
     {
         $databaseName = DB::getDatabaseName();
-        $migrationTableName = config('database.migrations', 'migrations');
+        $migrationTableName = $this->resolveMigrationTableName();
 
         if (empty($databaseName)) {
             return 'Database is not configured. Please set DB connection values in your .env file and try again.';
@@ -46,6 +46,24 @@ class DBStanAnalyzer
         }
 
         return null;
+    }
+
+    /**
+     * Resolve migration table name across Laravel config formats.
+     */
+    protected function resolveMigrationTableName(): string
+    {
+        $migrationsConfig = config('database.migrations', 'migrations');
+
+        if (is_string($migrationsConfig) && $migrationsConfig !== '') {
+            return $migrationsConfig;
+        }
+
+        if (is_array($migrationsConfig) && !empty($migrationsConfig['table']) && is_string($migrationsConfig['table'])) {
+            return $migrationsConfig['table'];
+        }
+
+        return 'migrations';
     }
 
     /**
