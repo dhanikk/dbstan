@@ -1,5 +1,12 @@
 # DBStan - Laravel Database Schema Analysis & Insights  
 
+[![Latest Version](https://img.shields.io/packagist/v/itpathsolutions/dbstan.svg?style=flat-square)](https://packagist.org/packages/itpathsolutions/dbstan)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen?style=flat-square)]()
+[![Total Downloads](https://img.shields.io/packagist/dt/itpathsolutions/dbstan.svg?style=flat-square)](https://packagist.org/packages/itpathsolutions/dbstan)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-blue?style=flat-square)]()
+[![Laravel](https://img.shields.io/badge/laravel-9%20to%2013-red?style=flat-square)]()
+
 The **DBStan** package provides detailed analysis and insights into your database schema for Laravel applications. It helps identify structural issues, missing indexes, normalization problems, nullable column risks, foreign key inconsistencies, and performance concerns.
 
 It is an essential tool for **debugging, optimizing, reviewing, and maintaining a healthy database architecture** in Laravel projects.
