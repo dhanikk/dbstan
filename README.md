@@ -63,14 +63,6 @@ Do **NOT** expose this tool publicly in production without proper access restric
 
 ---
 
-## 🎥 Demo
-
-![Demo Preview](./demo/demo.gif)
-
-👉 [Download / Watch Full Video](./demo/demo.mp4)
-
----
-
 ## **Features**
 
 - Analyze full database schema structure
