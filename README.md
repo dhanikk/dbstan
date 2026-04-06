@@ -94,7 +94,8 @@ Do **NOT** expose this tool publicly in production without proper access restric
 ## **Supported Versions**
 
 - **PHP:** ^8.1 | ^8.2 | ^8.3 | ^8.4 | ^8.5  
-- **Illuminate Support:** ^9.0 | ^10.0 | ^11.0 | ^12.0 | ^13.0  
+- **Illuminate Support:** ^9.0 | ^10.0 | ^11.0 | ^12.0 | ^13.0
+- **Database:** MySQL (5.7+ / 8.0+ recommended)
 
 ---
 
