@@ -27,6 +27,22 @@ class DBStanAnalyze extends Command
     public function handle()
     {
         $analyzer = new DBStanAnalyzer();
+        $info = $analyzer->getDatabaseInfo();
+
+        $this->line('');
+        $this->info('🔍 DBStan Analysis Context');
+        $this->line(str_repeat('-', 40));
+
+        $this->line("Driver      : {$info['driver']}");
+        $this->line("Database    : {$info['database']}");
+        $this->line("Host        : {$info['host']}");
+        $this->line("Port        : {$info['port']}");
+        $this->line("Tables      : {$info['tables']}");
+        $this->line("Environment : {$info['environment']}");
+
+        $this->line(str_repeat('-', 40));
+        $this->line('');
+
         $preflightError = $analyzer->getPreflightError();
 
         if ($preflightError !== null) {

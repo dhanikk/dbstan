@@ -11,6 +11,8 @@ The **DBStan** package provides detailed analysis and insights into your databas
 
 It is an essential tool for **debugging, optimizing, reviewing, and maintaining a healthy database architecture** in Laravel projects.
 
+Current release: **v1.0.8** with **MySQL and PostgreSQL** support.
+
 ---
 
 ## **Important Notice: Configure Database Before Using This Package**  
@@ -61,6 +63,14 @@ Do **NOT** expose this tool publicly in production without proper access restric
 
 ---
 
+## 🎥 Demo
+
+![Demo Preview](./demo/demo.gif)
+
+👉 [Download / Watch Full Video](./demo/demo.mp4)
+
+---
+
 ## **Features**
 
 - Analyze full database schema structure
@@ -86,6 +96,7 @@ Do **NOT** expose this tool publicly in production without proper access restric
 - Detect status columns missing indexes
 - Detect polymorphic relation overuse and missing indexes
 - Lightweight and optimized for fast schema scanning
+- Supports MySQL and PostgreSQL database drivers
 - Supports Laravel 9, 10, 11, 12, and 13 with PHP 8.1+ compatibility
 - CLI-based analysis with structured categorized output
 
@@ -94,8 +105,8 @@ Do **NOT** expose this tool publicly in production without proper access restric
 ## **Supported Versions**
 
 - **PHP:** ^8.1 | ^8.2 | ^8.3 | ^8.4 | ^8.5  
-- **Illuminate Support:** ^9.0 | ^10.0 | ^11.0 | ^12.0 | ^13.0
-- **Database:** MySQL (5.7+ / 8.0+ recommended)
+- **Illuminate Support:** ^9.0 | ^10.0 | ^11.0 | ^12.0 | ^13.0  
+- **Database:** MySQL (5.7+ / 8.0+ recommended), PostgreSQL
 
 ---
 
@@ -217,6 +228,17 @@ Ensure your `.env` file contains:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+For PostgreSQL, use:
+
+```bash
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
 DB_DATABASE=your_database
 DB_USERNAME=your_username
 DB_PASSWORD=your_password

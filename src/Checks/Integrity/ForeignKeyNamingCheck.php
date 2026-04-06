@@ -16,8 +16,10 @@ class ForeignKeyNamingCheck extends BaseCheck
         return 'integrity';
     }
 
-    // Add comment to explain the purpose of this check
-    // This check identifies columns that look like foreign keys (ending with "id") but do not follow the common naming convention of ending with "_id". It helps ensure that foreign key columns are consistently named, which can improve code readability and maintainability.
+    /**
+     * This check identifies columns that look like foreign keys (ending with "id")
+     * but do not follow the standard "_id" naming convention.
+     */
     public function run(array $schema): array
     {
         $issues = [];
@@ -26,12 +28,21 @@ class ForeignKeyNamingCheck extends BaseCheck
 
             foreach ($data['columns'] ?? [] as $column) {
 
-                $field = $column->Field;
+                // ✅ Normalize column name across DBs
+                if (isset($column->name)) {
+                    $field = $column->name;
+                } elseif (isset($column->Field)) {
+                    $field = $column->Field; // MySQL fallback
+                } elseif (isset($column->column_name)) {
+                    $field = $column->column_name; // PostgreSQL fallback
+                } else {
+                    continue;
+                }
+
                 $fieldLower = strtolower($field);
 
                 // Detect columns ending with "id" but not "_id"
-                $looksLikeForeignKey =
-                    preg_match('/^[a-z0-9]+id$/i', $fieldLower);
+                $looksLikeForeignKey = preg_match('/^[a-z0-9]+id$/i', $fieldLower);
 
                 if (
                     $looksLikeForeignKey &&
@@ -39,7 +50,7 @@ class ForeignKeyNamingCheck extends BaseCheck
                     $fieldLower !== 'id'
                 ) {
                     $issues["fk_naming"][] =
-                        "\033[0;30;43m[NAMING]\033[0m '$table.$field' column should follow foreign key naming convention: use '{$fieldLower}_id'";
+                        "\033[0;30;43m[NAMING]\033[0m '{$table}.{$field}' column should follow foreign key naming convention: use '{$fieldLower}_id'";
                 }
             }
         }

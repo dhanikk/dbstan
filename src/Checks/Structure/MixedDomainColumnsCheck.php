@@ -24,10 +24,32 @@ class MixedDomainColumnsCheck extends BaseCheck
 
             foreach ($data['columns'] ?? [] as $column) {
 
-                if ($this->isMixedDomain($column)) {
+                // ✅ Normalize column name
+                if (isset($column->name)) {
+                    $field = $column->name;
+                } elseif (isset($column->Field)) {
+                    $field = $column->Field; // MySQL
+                } elseif (isset($column->column_name)) {
+                    $field = $column->column_name; // PostgreSQL
+                } else {
+                    continue;
+                }
+
+                // ✅ Normalize type
+                if (isset($column->type)) {
+                    $type = strtolower($column->type);
+                } elseif (isset($column->Type)) {
+                    $type = strtolower($column->Type); // MySQL
+                } elseif (isset($column->data_type)) {
+                    $type = strtolower($column->data_type); // PostgreSQL
+                } else {
+                    continue;
+                }
+
+                if ($this->isMixedDomain($field, $type)) {
 
                     $issues["mixed_domain"][] =
-                        "\033[0;37;45m[DOMAIN MIX]\033[0m '$table.{$column->Field}' column mixes different types of data";
+                        "\033[0;37;45m[DOMAIN MIX]\033[0m '{$table}.{$field}' column mixes different types of data";
                 }
             }
         }
@@ -37,19 +59,16 @@ class MixedDomainColumnsCheck extends BaseCheck
 
     /**
      * Heuristic detection of mixed domain columns
-     * Example: columns storing comma separated values, JSON in varchar, etc.
      */
-    protected function isMixedDomain($column): bool
+    protected function isMixedDomain(string $field, string $type): bool
     {
-        $type = strtolower($column->Type);
-
-        // Example heuristics (you can improve later)
+        // Example heuristics
         return
             str_contains($type, 'varchar') &&
             (
-                str_contains($column->Field, 'data') ||
-                str_contains($column->Field, 'info') ||
-                str_contains($column->Field, 'details')
+                str_contains($field, 'data') ||
+                str_contains($field, 'info') ||
+                str_contains($field, 'details')
             );
     }
 }

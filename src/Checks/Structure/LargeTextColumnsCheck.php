@@ -16,8 +16,9 @@ class LargeTextColumnsCheck extends BaseCheck
         return 'structure';
     }
 
-    // Add comment to explain the purpose of this check
-    // This check identifies columns that use the TEXT data type, which can lead to performance issues if they are frequently queried or if they contain large amounts of data. Large TEXT columns can also indicate that the table may be trying to store too much information in a single row, which can be a sign of poor database design. This check helps highlight potential performance risks and encourages better database design by suggesting that large text data might be better stored in a separate table or using a different data type.
+    /**
+     * Detect TEXT-like columns that may impact performance
+     */
     public function run(array $schema): array
     {
         $issues = [];
@@ -26,10 +27,35 @@ class LargeTextColumnsCheck extends BaseCheck
 
             foreach ($data['columns'] ?? [] as $column) {
 
-                if (str_contains(strtolower($column->Type), 'text')) {
+                // ✅ Normalize column name
+                if (isset($column->name)) {
+                    $field = $column->name;
+                } elseif (isset($column->Field)) {
+                    $field = $column->Field; // MySQL
+                } elseif (isset($column->column_name)) {
+                    $field = $column->column_name; // PostgreSQL
+                } else {
+                    continue;
+                }
 
+                // ✅ Normalize column type
+                if (isset($column->type)) {
+                    $type = strtolower($column->type);
+                } elseif (isset($column->Type)) {
+                    $type = strtolower($column->Type); // MySQL
+                } elseif (isset($column->data_type)) {
+                    $type = strtolower($column->data_type); // PostgreSQL
+                } else {
+                    continue;
+                }
+
+                // ✅ Detect TEXT-like types
+                if (
+                    str_contains($type, 'text') ||   // MySQL: text, longtext, mediumtext
+                    $type === 'text'                 // PostgreSQL: text
+                ) {
                     $issues["large_text"][] =
-                        "\033[0;30;43m[PERF RISK]\033[0m '$table.{$column->Field}' column is TEXT — consider splitting table";
+                        "\033[0;30;43m[PERF RISK]\033[0m '{$table}.{$field}' column is TEXT — consider splitting table or optimizing usage";
                 }
             }
         }

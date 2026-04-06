@@ -16,9 +16,9 @@ class NullableOveruseCheck extends BaseCheck
         return 'structure';
     }
 
-    // Add comment to explain the purpose of this check
-    // This check identifies columns that are marked as nullable without a clear justification. Overusing nullable columns can lead to data integrity issues and may indicate that the database design is not well thought out. Nullable columns can make it harder to enforce data consistency and can lead to unexpected null values in queries. This check helps encourage better database design by flagging columns that may not need to be nullable, prompting developers to reconsider their schema design and ensure that nullability is used appropriately.
-    
+    /**
+     * Detect unnecessary nullable columns
+     */
     public function run(array $schema): array
     {
         $issues = [];
@@ -27,12 +27,34 @@ class NullableOveruseCheck extends BaseCheck
 
             foreach ($data['columns'] ?? [] as $column) {
 
+                // ✅ Normalize column name
+                if (isset($column->name)) {
+                    $field = $column->name;
+                } elseif (isset($column->Field)) {
+                    $field = $column->Field; // MySQL
+                } elseif (isset($column->column_name)) {
+                    $field = $column->column_name; // PostgreSQL
+                } else {
+                    continue;
+                }
+
+                // ✅ Normalize nullable flag
+                if (isset($column->nullable)) {
+                    $isNullable = $column->nullable;
+                } elseif (isset($column->Null)) {
+                    $isNullable = strtoupper($column->Null) === 'YES'; // MySQL
+                } elseif (isset($column->is_nullable)) {
+                    $isNullable = strtoupper($column->is_nullable) === 'YES'; // PostgreSQL
+                } else {
+                    $isNullable = false;
+                }
+
                 if (
-                    $column->Null === 'YES' &&
-                    !$this->isNullableJustified($column)
+                    $isNullable &&
+                    !$this->isNullableJustified($field)
                 ) {
                     $issues["nullable_overuse"][] =
-                        "\033[0;30;43m[NULLABLE]\033[0m '$table.{$column->Field}' column is nullable without clear reason";
+                        "\033[0;30;43m[NULLABLE]\033[0m '{$table}.{$field}' column is nullable without clear reason";
                 }
             }
         }
@@ -43,7 +65,7 @@ class NullableOveruseCheck extends BaseCheck
     /**
      * Basic heuristic to allow some commonly nullable columns
      */
-    protected function isNullableJustified($column): bool
+    protected function isNullableJustified(string $field): bool
     {
         $allowedNullable = [
             'deleted_at',
@@ -51,6 +73,6 @@ class NullableOveruseCheck extends BaseCheck
             'remember_token',
         ];
 
-        return in_array($column->Field, $allowedNullable);
+        return in_array($field, $allowedNullable);
     }
 }

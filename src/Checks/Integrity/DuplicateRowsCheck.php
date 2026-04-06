@@ -16,8 +16,10 @@ class DuplicateRowsCheck extends BaseCheck
         return 'integrity';
     }
 
-    // Add comment to explain the purpose of this check
-    // This check identifies tables that do not have a PRIMARY or UNIQUE constraint, which means that duplicate rows could exist in those tables, potentially leading to data integrity issues.
+    /**
+     * This check identifies tables without PRIMARY or UNIQUE constraints,
+     * which may allow duplicate rows and lead to data integrity issues.
+     */
     public function run(array $schema): array
     {
         $issues = [];
@@ -31,19 +33,37 @@ class DuplicateRowsCheck extends BaseCheck
 
             foreach ($indexes as $index) {
 
-                if ($index->Key_name === 'PRIMARY') {
-                    $hasPrimary = true;
+                // ✅ MySQL support
+                if (isset($index->Key_name)) {
+
+                    if ($index->Key_name === 'PRIMARY') {
+                        $hasPrimary = true;
+                    }
+
+                    if (($index->Non_unique ?? 1) == 0) {
+                        $hasUnique = true;
+                    }
                 }
 
-                if (($index->Non_unique ?? 1) == 0) {
-                    $hasUnique = true;
+                // ✅ PostgreSQL support
+                elseif (isset($index->indexdef)) {
+
+                    $definition = strtolower($index->indexdef);
+
+                    if (str_contains($definition, 'primary key')) {
+                        $hasPrimary = true;
+                    }
+
+                    if (str_contains($definition, 'unique')) {
+                        $hasUnique = true;
+                    }
                 }
             }
 
             if (!$hasPrimary && !$hasUnique) {
 
                 $issues["duplicate_rows_risk"][] =
-                    "\033[0;30;43m[DATA INTEGRITY]\033[0m '$table' table has no PRIMARY or UNIQUE constraint — duplicate rows possible";
+                    "\033[0;30;43m[DATA INTEGRITY]\033[0m '{$table}' table has no PRIMARY or UNIQUE constraint — duplicate rows possible";
             }
         }
 

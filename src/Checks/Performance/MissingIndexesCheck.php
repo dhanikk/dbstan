@@ -16,25 +16,58 @@ class MissingIndexesCheck extends BaseCheck
         return 'performance';
     }
 
-    // Add comment to explain the purpose of this check
-    /* This check identifies columns that look like foreign keys (ending with "_id") but do not have an index. Missing indexes on foreign key columns can lead to slow query performance, especially when joining tables or filtering by those columns. This check helps ensure that foreign key columns are properly indexed for optimal performance. */
+    /**
+     * This check identifies "_id" columns that do not have indexes.
+     * Missing indexes on FK-like columns can slow down joins and queries.
+     */
     public function run(array $schema): array
     {
         $issues = [];
 
         foreach ($schema as $table => $data) {
 
-            // Collect indexed columns
-            $indexColumns = array_column($data['indexes'] ?? [], 'Column_name');
+            $indexes = $data['indexes'] ?? [];
+            $indexColumns = [];
 
-            foreach ($data['columns'] as $column) {
+            // ✅ Normalize index columns for MySQL + PostgreSQL
+            foreach ($indexes as $index) {
+
+                // MySQL
+                if (isset($index->Column_name)) {
+                    $indexColumns[] = $index->Column_name;
+                }
+
+                // PostgreSQL (parse index definition)
+                elseif (isset($index->indexdef)) {
+                    if (preg_match('/\((.*?)\)/', $index->indexdef, $matches)) {
+                        $cols = explode(',', $matches[1]);
+
+                        foreach ($cols as $col) {
+                            $indexColumns[] = trim(str_replace('"', '', $col));
+                        }
+                    }
+                }
+            }
+
+            foreach ($data['columns'] ?? [] as $column) {
+
+                // ✅ Normalize column name
+                if (isset($column->name)) {
+                    $field = $column->name;
+                } elseif (isset($column->Field)) {
+                    $field = $column->Field;
+                } elseif (isset($column->column_name)) {
+                    $field = $column->column_name;
+                } else {
+                    continue;
+                }
 
                 if (
-                    str_ends_with($column->Field, '_id') &&
-                    !in_array($column->Field, $indexColumns)
+                    str_ends_with($field, '_id') &&
+                    !in_array($field, $indexColumns)
                 ) {
                     $issues["missing_index"][] =
-                        "\033[0;37;41m[ERROR]\033[0m '$table.{$column->Field}' column looks like FK but has no index";
+                        "\033[0;37;41m[ERROR]\033[0m '{$table}.{$field}' column looks like FK but has no index";
                 }
             }
         }

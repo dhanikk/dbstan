@@ -1,16 +1,13 @@
 <?php
+
 namespace Itpathsolutions\DBStan;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Itpathsolutions\DBStan\Contracts\CheckInterface;
 use Throwable;
 
 class DBStanAnalyzer
 {
-    /**
-     * Registered check instances
-     */
     protected array $checks = [];
 
     public function __construct()
@@ -18,57 +15,72 @@ class DBStanAnalyzer
         $this->loadChecks();
     }
 
-    /**
-     * Validate DB configuration/connection and migration state before analysis.
-     */
+    public function getDatabaseInfo(): array
+    {
+        $driver = DB::getDriverName();
+        $database = DB::getDatabaseName();
+
+        $config = config("database.connections.$driver");
+
+        // Count tables
+        $tablesCount = 0;
+
+        if ($driver === 'mysql') {
+            $tables = DB::select('SHOW TABLES');
+            $tablesCount = count($tables);
+        } elseif ($driver === 'pgsql') {
+            $tables = DB::select("
+                SELECT tablename 
+                FROM pg_catalog.pg_tables 
+                WHERE schemaname = 'public'
+            ");
+            $tablesCount = count($tables);
+        }
+
+        return [
+            'driver' => $driver,
+            'database' => $database,
+            'host' => $config['host'] ?? 'N/A',
+            'port' => $config['port'] ?? 'N/A',
+            'tables' => $tablesCount,
+            'environment' => app()->environment(),
+        ];
+    }
     public function getPreflightError(): ?string
     {
         $databaseName = DB::getDatabaseName();
         $migrationTableName = $this->resolveMigrationTableName();
 
         if (empty($databaseName)) {
-            return 'Database is not configured. Please set DB connection values in your .env file and try again.';
+            return 'Database is not configured.';
         }
 
         try {
             DB::connection()->getPdo();
         } catch (Throwable $e) {
-            return 'Unable to connect to the configured database. Please verify your .env DB credentials and ensure the database server is running.';
+            return 'Database connection failed.';
         }
 
         if (!DB::getSchemaBuilder()->hasTable($migrationTableName)) {
-            return 'Migrations table was not found. Please run migration first: php artisan migrate';
+            return 'Run migrations first.';
         }
 
-        $migrationsCount = (int) DB::table($migrationTableName)->count();
-        if ($migrationsCount === 0) {
-            return 'No migrations have been applied yet. Please run migration first: php artisan migrate';
+        if (DB::table($migrationTableName)->count() === 0) {
+            return 'No migrations found.';
         }
 
         return null;
     }
 
-    /**
-     * Resolve migration table name across Laravel config formats.
-     */
     protected function resolveMigrationTableName(): string
     {
-        $migrationsConfig = config('database.migrations', 'migrations');
+        $config = config('database.migrations', 'migrations');
 
-        if (is_string($migrationsConfig) && $migrationsConfig !== '') {
-            return $migrationsConfig;
-        }
-
-        if (is_array($migrationsConfig) && !empty($migrationsConfig['table']) && is_string($migrationsConfig['table'])) {
-            return $migrationsConfig['table'];
-        }
-
-        return 'migrations';
+        return is_array($config)
+            ? ($config['table'] ?? 'migrations')
+            : $config;
     }
 
-    /**
-     * Auto-discover and load all check classes
-     */
     protected function loadChecks(): void
     {
         $path = __DIR__ . '/Checks';
@@ -77,54 +89,34 @@ class DBStanAnalyzer
 
             $class = $this->getClassFromFile($file);
 
-            if (!class_exists($class)) {
-                continue;
-            }
+            if (!class_exists($class)) continue;
 
             $reflection = new \ReflectionClass($class);
 
-            // Skip abstract classes, interfaces, traits
-            if (
-                $reflection->isAbstract() ||
-                $reflection->isInterface() ||
-                $reflection->isTrait()
-            ) {
+            if ($reflection->isAbstract() || $reflection->isInterface() || $reflection->isTrait()) {
                 continue;
             }
 
-            // Ensure it implements CheckInterface
-            if (
-                in_array(
-                    \Itpathsolutions\DBStan\Contracts\CheckInterface::class,
-                    $reflection->getInterfaceNames()
-                )
-            ) {
+            if (in_array(
+                \Itpathsolutions\DBStan\Contracts\CheckInterface::class,
+                $reflection->getInterfaceNames()
+            )) {
                 $this->checks[] = app($class);
             }
         }
     }
 
-    /**
-     * Convert file path to fully qualified class name
-     */
     protected function getClassFromFile($file): string
     {
-        $path = $file->getRealPath();
-
-        $relative = str_replace(__DIR__ . DIRECTORY_SEPARATOR, '', $path);
-        $relative = str_replace('.php', '', $relative);
-        $relative = str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
+        $relative = str_replace(__DIR__ . DIRECTORY_SEPARATOR, '', $file->getRealPath());
+        $relative = str_replace(['.php', DIRECTORY_SEPARATOR], ['', '\\'], $relative);
 
         return __NAMESPACE__ . '\\' . $relative;
     }
 
-    /**
-     * Run full DB analysis
-     */
     public function analyze(): array
     {
-        $preflightError = $this->getPreflightError();
-        if ($preflightError !== null) {
+        if ($this->getPreflightError()) {
             return [
                 'structure' => [],
                 'integrity' => [],
@@ -135,80 +127,90 @@ class DBStanAnalyzer
 
         $schema = $this->extractSchema();
 
-        $groupedIssues = [
+        $grouped = [
             'structure' => [],
             'integrity' => [],
             'performance' => [],
             'architecture' => [],
         ];
 
-        $enabledCategories = config('dbstan.enabled_checks', [
-            'structure',
-            'integrity',
-            'performance',
-            'architecture',
-        ]);
         foreach ($this->checks as $check) {
 
             $category = $check->category();
-
-            if (!in_array($category, $enabledCategories)) {
-                continue;
-            }
-
             $issues = array_filter($check->run($schema));
+
             if (!empty($issues)) {
-                $groupedIssues[$category] = array_merge(
-                    $groupedIssues[$category],
-                    $issues
-                );
+                $grouped[$category] = array_merge($grouped[$category], $issues);
             }
         }
-        return $groupedIssues;
+
+        return $grouped;
     }
 
-    /**
-     * Extract full DB schema
-     */
     protected function extractSchema(): array
     {
-        $tables = DB::select('SHOW TABLES');
-        $dbNameKey = 'Tables_in_' . DB::getDatabaseName();
-        $databaseName = DB::getDatabaseName();
-
-        $tableMetaRows = DB::select(
-            'SELECT TABLE_NAME, ENGINE, TABLE_COLLATION, TABLE_ROWS, AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?',
-            [$databaseName]
-        );
-
-        $tableMeta = [];
-        foreach ($tableMetaRows as $row) {
-            $tableMeta[$row->TABLE_NAME] = [
-                'engine' => $row->ENGINE ?? null,
-                'table_collation' => $row->TABLE_COLLATION ?? null,
-                'table_rows' => (int) ($row->TABLE_ROWS ?? 0),
-                'auto_increment' => $row->AUTO_INCREMENT !== null ? (int) $row->AUTO_INCREMENT : null,
-            ];
-        }
-
+        $driver = DB::getDriverName();
         $schema = [];
 
-        foreach ($tables as $tableObj) {
+        if ($driver === 'mysql') {
 
-            $tableName = $tableObj->$dbNameKey;
-            $meta = $tableMeta[$tableName] ?? [];
+            $tables = DB::select('SHOW TABLES');
+            $key = 'Tables_in_' . DB::getDatabaseName();
 
-            $schema[$tableName] = [
-                'columns' => DB::select("SHOW FULL COLUMNS FROM `$tableName`"),
-                'indexes' => DB::select("SHOW INDEX FROM `$tableName`"),
-                'engine' => $meta['engine'] ?? null,
-                'table_collation' => $meta['table_collation'] ?? null,
-                'table_rows' => $meta['table_rows'] ?? 0,
-                'auto_increment' => $meta['auto_increment'] ?? null,
-            ];
+            foreach ($tables as $tableObj) {
+
+                $table = $tableObj->$key;
+
+                $columnsRaw = DB::select("SHOW FULL COLUMNS FROM `$table`");
+                $indexes = DB::select("SHOW INDEX FROM `$table`");
+
+                $columns = array_map(fn($col) => (object)[
+                    'name' => $col->Field,
+                    'type' => strtolower($col->Type),
+                ], $columnsRaw);
+
+                $schema[$table] = [
+                    'columns' => $columns,
+                    'indexes' => $indexes,
+                ];
+            }
+
+        } elseif ($driver === 'pgsql') {
+
+            $tables = DB::select("
+                SELECT tablename 
+                FROM pg_catalog.pg_tables 
+                WHERE schemaname = 'public'
+            ");
+
+            foreach ($tables as $tableObj) {
+
+                $table = $tableObj->tablename;
+
+                $columnsRaw = DB::select("
+                    SELECT column_name, data_type
+                    FROM information_schema.columns
+                    WHERE table_name = ?
+                ", [$table]);
+
+                $indexes = DB::select("
+                    SELECT indexname, indexdef
+                    FROM pg_indexes
+                    WHERE tablename = ?
+                ", [$table]);
+
+                $columns = array_map(fn($col) => (object)[
+                    'name' => $col->column_name,
+                    'type' => strtolower($col->data_type),
+                ], $columnsRaw);
+
+                $schema[$table] = [
+                    'columns' => $columns,
+                    'indexes' => $indexes,
+                ];
+            }
         }
 
         return $schema;
     }
-
 }

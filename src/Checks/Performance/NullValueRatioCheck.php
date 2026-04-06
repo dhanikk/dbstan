@@ -17,15 +17,16 @@ class NullValueRatioCheck extends BaseCheck
         return 'performance';
     }
 
-    // Add comment to explain the purpose of this check
-    // This check identifies columns that allow NULL values and have a high ratio of NULLs compared to total rows (greater than 50%). A high NULL ratio can indicate potential data quality issues or that the column may not be necessary. It can also impact query performance, as NULL values can affect indexing and query optimization. This check helps highlight columns that may need to be reviewed for data quality and performance improvements.
+    /**
+     * Detect columns with high NULL ratio (>50%)
+     */
     public function run(array $schema): array
     {
         $issues = [];
 
         foreach ($schema as $table => $data) {
 
-            // Get total row count once per table
+            // ✅ Get total row count once
             $totalCount = DB::table($table)->count();
 
             if ($totalCount === 0) {
@@ -34,23 +35,54 @@ class NullValueRatioCheck extends BaseCheck
 
             foreach ($data['columns'] ?? [] as $column) {
 
-                // Only check nullable columns
-                if (strtoupper($column->Null) !== 'YES') {
+                // ✅ Normalize column name
+                if (isset($column->name)) {
+                    $field = $column->name;
+                } elseif (isset($column->Field)) {
+                    $field = $column->Field; // MySQL
+                } elseif (isset($column->column_name)) {
+                    $field = $column->column_name; // PostgreSQL
+                } else {
                     continue;
                 }
 
-                $nullCount = DB::table($table)
-                    ->whereNull($column->Field)
-                    ->count();
+                // ✅ Normalize nullable flag
+                if (isset($column->nullable)) {
+                    $isNullable = $column->nullable;
+                } elseif (isset($column->Null)) {
+                    $isNullable = strtoupper($column->Null) === 'YES'; // MySQL
+                } elseif (isset($column->is_nullable)) {
+                    $isNullable = strtoupper($column->is_nullable) === 'YES'; // PostgreSQL
+                } else {
+                    $isNullable = false;
+                }
 
-                $ratio = $nullCount / $totalCount;
+                // Only check nullable columns
+                if (!$isNullable) {
+                    continue;
+                }
+
+                // ✅ Optimized: single query instead of 2
+                $result = DB::table($table)
+                    ->selectRaw("
+                        COUNT(*) as total,
+                        COUNT({$field}) as non_null
+                    ")
+                    ->first();
+
+                if (!$result || $result->total == 0) {
+                    continue;
+                }
+
+                $nullCount = $result->total - $result->non_null;
+                $ratio = $nullCount / $result->total;
 
                 if ($ratio > 0.5) {
 
                     $percentage = round($ratio * 100, 2);
 
                     $issues["high_null_ratio"][] =
-                        "\033[0;30;43m[DATA QUALITY]\033[0m '$table.{$column->Field}' column has high NULL ratio ({$percentage}%)";
+                        "\033[0;30;43m[DATA QUALITY]\033[0m '{$table}.{$field}' column has high NULL ratio ({$percentage}%)";
                 }
             }
         }

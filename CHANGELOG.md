@@ -27,35 +27,20 @@ All notable changes to this project will be documented in this file.
 - Enhanced index cardinality analysis with status/flag standalone-index misuse warnings.
 - Updated pivot table structure rule to allow timestamps (aligning with global timestamp policy).
 
-## [1.0.7] - 2026-04-03
-### Fixed
-- Resolved migration table lookup to support Laravel database config arrays and custom table names.
-- Added fallback handling when the migration table config is missing or empty.
-
-### Changed
-- Bumped package version metadata to 1.0.7.
-
-## [1.0.6] - 2026-03-31
+## [1.0.8] - 2026-04-06
 ### Added
-- Progress bar and updated icon styling.
-- Route color value display in the web output.
-- Storage engine checks and table structure enhancements.
+- Added PostgreSQL support.
 
 ### Changed
-- Updated README guidance to reflect the new scan flow and package support changes.
-- Expanded compatibility to Laravel 13 and PHP 8.5.
-- Updated package version metadata to 1.0.6.
+- Released version 1.0.8.
 
-## [1.0.5] - 2026-03-09
-### Fixed
-- Added logic to show a message when the database is not selected.
-- Updated error color naming by type.
-- Added a loader while scanning the database.
+## [1.0.1] - 2026-02-13
+### Added
+- Initial release of orphan risk check
 
-## [1.0.4] - 2026-03-09
+## [1.0.2] - 2026-02-13
 ### Fixed
 - Minor bug fixes
-- Updated README.md
 
 ## [1.0.3] - 2026-02-26
 ### Added
@@ -69,10 +54,13 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - No critical fixes in this release
 
-## [1.0.2] - 2026-02-13
+## [1.0.4] - 2026-03-09
 ### Fixed
 - Minor bug fixes
+- Updated README.md
 
-## [1.0.1] - 2026-02-13
-### Added
-- Initial release of orphan risk check
+## [1.0.5] - 2026-03-09
+### Fixed
+- Added logic to show a message when the database is not selected.
+- Updated error color naming by type.
+- Added a loader while scanning the database.
