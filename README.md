@@ -63,6 +63,12 @@ Do **NOT** expose this tool publicly in production without proper access restric
 
 ---
 
+## Video
+
+- https://www.youtube.com/watch?v=Xv5m10R3wmc
+
+---
+
 ## **Features**
 
 - Analyze full database schema structure
